@@ -18,7 +18,7 @@ bot.on('message', (message) => {
     } else {
         if (message.channel.type == 'dm' && message.author.tag != bot.user.tag) {
             if (message.content.startsWith('!')) {
-                let args = message.content.substring(1).toLocaleUpperCase();
+                let args = message.content.substring(1);
                 console.log(args);
                 switch (args) {
                     case 'comandos':
@@ -46,7 +46,7 @@ bot.on('message', (message) => {
 
         // frases de apañe
         if (message.content.startsWith('valvo') && message.channel.type != 'dm') {
-            let args = message.content.substring(6).toLocaleUpperCase();
+            let args = message.content.substring(6);
             switch (args) {
                 case 'apañai?':
                     message.channel.send('demás po perro!');
@@ -84,7 +84,7 @@ bot.on('message', (message) => {
         }
         // frases jugemos
         if (message.content.startsWith('valvo juguemos' && message.channel.type != 'dm')) {
-            let args = message.content.substring(15).toLocaleUpperCase();
+            let args = message.content.substring(15);
             console.log(args);
             switch (args) {
                 case 'fable?':
