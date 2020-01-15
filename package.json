@@ -4,6 +4,9 @@
     "description": "Este bot te puede acompañar cuando valvo no",
     "main": "bot.js",
     "author": "Wigan",
+    "scripts":{ 
+        "starts": "node bot.js"
+    },
     "dependencies": {
         "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
         "winston": "^3.2.1"
