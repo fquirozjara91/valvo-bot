@@ -36,7 +36,7 @@ bot.on('message', (message) => {
                             value: "`apañai?` `estoy aburrido` `eres un bot?`"
                         },
                         {
-                            name: "jugemos",
+                            name: "juguemos",
                             value: "`fable` `warframe` `anthem` `piratas` `apb` `forza` `black desert`"
                         }
                     ]
@@ -71,7 +71,7 @@ bot.on('message', (message) => {
         }
     }
     // frases jugemos
-    if (message.content.startsWith('valvo jugemos')) {
+    if (message.content.startsWith('valvo juguemos')) {
         let args = message.content.substring(14);
         console.log(args);
         switch (args) {
