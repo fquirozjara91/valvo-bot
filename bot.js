@@ -3,6 +3,7 @@ const { createEmbedMessage, laVerdad, sendMentionMessage, sendNormalMessage, sen
 
 var bot = new Discord.Client();
 const attachment = new Discord.Attachment('./images/valvo-avatar.png', 'valvo-avatar.png');
+const valvoCeption = new Discord.Attachment('./images/spider-valvo.jpg');
 var auth = require('./auth.json');
 bot.login(auth.token);
 
@@ -11,6 +12,13 @@ bot.on('ready', () => {
 });
 
 bot.on('message', (message) => {
+
+    if (message.author.tag == 'Valvoywea#6264' && message.content.startsWith('valvo')) {
+
+        message.channel.send("espera!... quien eres tu!?!?!?", {
+            file: valvoCeption
+        });
+    }
 
     if (message.channel.type == 'dm' && message.author.tag != bot.user.tag) {
 
