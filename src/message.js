@@ -45,7 +45,7 @@ exports.laVerdad = () => {
         },
         {
             name: "ayuda",
-            value: "`!comandos`"
+            value: "`!comandos` `!sugerencias`"
         }
     ]
     return verdad;
