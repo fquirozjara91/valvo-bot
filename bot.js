@@ -72,7 +72,7 @@ bot.on('message', (message) => {
     }
     // frases jugemos
     if (message.content.startsWith('valvo juguemos')) {
-        let args = message.content.substring(14);
+        let args = message.content.substring(15);
         console.log(args);
         switch (args) {
             case 'fable?':
