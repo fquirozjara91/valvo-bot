@@ -1,13 +1,13 @@
 const { RichEmbed } = require('discord.js');
 
-exports.createEmbedMessage = (author = undefined, fields = undefined, thumbNail = undefined, footer = undefined) => {
+exports.createEmbedMessage = (author = undefined, fields = undefined, thumbNail = undefined, footer = undefined, link = undefined) => {
     let embed = new RichEmbed();
 
     if (undefined != author) {
         embed.setAuthor(author);
     }
 
-    if (fields.length > 0 && undefined != fields) {
+    if (undefined != fields && fields.length > 0) {
         for (const field of fields) {
             embed.addField(field.name, " " + field.value)
         }
@@ -20,6 +20,10 @@ exports.createEmbedMessage = (author = undefined, fields = undefined, thumbNail 
 
     if (undefined != footer) {
         embed.setFooter(footer.text, footer.icon);
+    }
+
+    if (undefined != link) {
+        embed.addField(link.name, link.value);
     }
     embed.setColor(0x860202);
 

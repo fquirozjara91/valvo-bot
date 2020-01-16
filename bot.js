@@ -33,13 +33,12 @@ bot.on('message', (message) => {
                         {
                             name: "juguemos",
                             value: "`fable` `warframe` `anthem` `piratas` `apb` `forza` `black desert`"
-                        },
-                        {
-                            name: "sugerencias",
-                            value: "si quieres agregar alguna funcion puedes hacerlo en el siguiente link seccion Issues `eres un bot?`"
                         }];
                         message.author.send(createEmbedMessage(undefined, comandos, attachment, undefined));
                         break;
+                    case 'sugerencias':
+                        message.author.send(createEmbedMessage(undefined, undefined, undefined, undefined, { name: 'Sugerencias', value: 'si quieres agregar nuevas funciones puedes dejar tu sugerencia en el siguiente link: [link](https://github.com/fquirozjara91/valvo-bot/issues)'}))
+                        
                 }
             }
         }
