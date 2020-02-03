@@ -16,9 +16,9 @@ bot.on('ready', () => {
 bot.on('message', (message) => {
 
     // valvoception
-    /*if (message.author.tag == 'Valvoywea#6264' && message.content.startsWith('valvo juguemos')) {
+    if (message.author.tag == 'Valvoywea#6264' && message.content.startsWith('valvo')) {
         message.channel.send("espera!... quien eres tu!?!?!?", { file: valvoCeption });
-    }*/
+    }
 
     // mensajes privados
     if (message.channel.type == 'dm' && message.author.tag != bot.user.tag) {
@@ -172,6 +172,13 @@ bot.on('message', (message) => {
             case 'apb?':
                 message.channel.send('uuuuuuhh igual, me vestiré de carabibueno para la ocasión');
                 bot.user.setActivity('APB Reloaded', { type: 'Playing' })
+                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
+                    .catch(console.error);
+                break;
+
+            case 'temtem?':
+                message.channel.send('uuuuuuhh hay que atraparlos a todos!')
+                bot.user.setActivity('Temtem', { type: 'Playing' })
                     .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
                     .catch(console.error);
                 break;
