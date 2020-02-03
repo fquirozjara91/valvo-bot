@@ -177,7 +177,7 @@ bot.on('message', (message) => {
                 break;
 
             case 'temtem?':
-                message.channel.send('uuuuuuhh hay que atraparlos a todos!')
+                message.channel.send('uuuuuuhh hay que atraparlos a todos!');
                 bot.user.setActivity('Temtem', { type: 'Playing' })
                     .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
                     .catch(console.error);

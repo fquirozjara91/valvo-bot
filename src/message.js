@@ -66,7 +66,7 @@ exports.sendEmbed2Dado = (dado1, dado2, descripcion, avatar, author, footer) => 
 exports.sendImgEmbed = (dado) => {
     let embed = new RichEmbed()
         .attachFiles([`./images/1dado/${dado}.png`])
-        .setImage(`attachment://${dado}.png`)
+        .setImage(`attachment://${dado}.png`);
     return embed;
 };
 
