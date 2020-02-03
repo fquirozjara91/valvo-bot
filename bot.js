@@ -84,9 +84,11 @@ bot.on('message', (message) => {
                     } else if (+dado1 + +dado2 == 12) {
                         footer = 'Un gran poder con lleva una gran responsabilidad, Tachuela Chico';
                     }
-                    message.channel.send(sendImgEmbed(dado1));
-                    message.channel.send(sendImgEmbed(dado2));
-                    message.channel.send(sendEmbed2Dado(dado1, dado2, descripcion, message.author.avatarURL, message.author.toString(), footer));
+                    message.channel.send(sendImgEmbed(dado1)).then(() => {
+                        message.channel.send(sendImgEmbed(dado2)).then(() => {
+                            message.channel.send(sendEmbed2Dado(dado1, dado2, descripcion, message.author.avatarURL, message.author.toString(), footer));
+                        });
+                    });
                 });
             });
         }
