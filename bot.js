@@ -1,5 +1,5 @@
 var Discord = require('discord.js');
-const { createEmbedMessage, laVerdad, sendMentionMessage, sendEmbedDado } = require('./src/message');
+const { createEmbedMessage, laVerdad, sendMentionMessage, sendEmbedDado, sendEmbed2Dado, sendImgEmbed } = require('./src/message');
 
 var bot = new Discord.Client();
 const attachment = new Discord.Attachment('./images/valvo-avatar.png', 'valvo-avatar.png');
@@ -27,17 +27,18 @@ bot.on('message', (message) => {
             switch (args) {
                 case 'comandos':
                     let comandos = [{
-                        name: "prefijo",
-                        value: "valvo"
-                    },
-                    {
-                        name: "apañes",
-                        value: "`apañai?` `estoy aburrido` `eres un bot?`"
-                    },
-                    {
-                        name: "juguemos",
-                        value: "`fable` `warframe` `anthem` `piratas` `apb` `forza` `black desert`"
-                    }];
+                            name: "prefijo",
+                            value: "valvo"
+                        },
+                        {
+                            name: "apañes",
+                            value: "`apañai?` `estoy aburrido` `eres un bot?`"
+                        },
+                        {
+                            name: "juguemos",
+                            value: "`fable` `warframe` `anthem` `piratas` `apb` `forza` `black desert`"
+                        }
+                    ];
                     message.author.send(createEmbedMessage(undefined, comandos, attachment));
                     break;
                 case 'sugerencias':
@@ -49,33 +50,45 @@ bot.on('message', (message) => {
 
     if (message.content.startsWith('valvo') && message.channel.type != 'dm') {
         let args = message.content.substring(6);
+        let descripcion = 'Tiro simple';
+        let footer = 'uuuh sigue participando...';
 
         // valvo-dados
         if (args.length >= 6 && message.content.substring(6, 12) == '1 dado') {
-
-            let com = message.content.substring(6, 12);
-            switch (com) {
-                case '1 dado':
-                    let descripcion = 'Tiro simple';
-                    let footer = 'uuuh sigue participando...';
-
-                    if (message.content.substring(17).length > 0) {
-                        descripcion = message.content.substring(18);
-                    }
-
-                    message.channel.send("***1 daditooo!***", { file: gif1Dados }).then((msg) => {
-                        msg.delete(4000).then(() => {
-                            let random = (Math.round(Math.random() * (6 - 1) + 1)).toString();
-                            if (random < 4) {
-                                footer = 'JAJAJAJA fucking looooser!';
-                            } else if (random == 6) {
-                                footer = 'un madaaafaking SIIIIIIIX!!';
-                            }
-                            message.channel.send(sendEmbedDado(descripcion, message.author.avatarURL, message.author.toString(), random, footer));
-                        });
-                    });
-                    break;
+            if (message.content.substring(17).length > 0) {
+                descripcion = message.content.substring(18);
             }
+
+            message.channel.send("***1 daditooo!***", { file: gif1Dados }).then((msg) => {
+                msg.delete(4000).then(() => {
+                    let dado = (Math.round(Math.random() * (6 - 1) + 1)).toString();
+                    if (dado < 4) {
+                        footer = 'JAJAJAJA fucking looooser!';
+                    } else if (dado == 6) {
+                        footer = 'un madaaafaking SIIIIIIIX!!';
+                    }
+                    message.channel.send(sendEmbedDado(dado, descripcion, message.author.avatarURL, message.author.toString(), footer));
+                });
+            });
+        }
+        if (args.length >= 6 && message.content.substring(6, 13) == '2 dados') {
+            if (message.content.substring(18).length > 0) {
+                descripcion = message.content.substring(18);
+            }
+            message.channel.send("***2 daditooos!***", { file: gif1Dados }).then((msg) => {
+                msg.delete(4000).then(() => {
+                    let dado1 = (Math.round(Math.random() * (6 - 1) + 1)).toString();
+                    let dado2 = (Math.round(Math.random() * (6 - 1) + 1)).toString();
+                    if (+dado1 + +dado2 < 5) {
+                        footer = 'JAJAJAJA fucking looooser!';
+                    } else if (+dado1 + +dado2 == 12) {
+                        footer = 'Un gran poder con lleva una gran responsabilidad, Tachuela Chico';
+                    }
+                    message.channel.send(sendImgEmbed(dado1));
+                    message.channel.send(sendImgEmbed(dado2));
+                    message.channel.send(sendEmbed2Dado(dado1, dado2, descripcion, message.author.avatarURL, message.author.toString(), footer));
+                });
+            });
         }
 
         // frases de apañe
@@ -99,7 +112,7 @@ bot.on('message', (message) => {
                 message.author.send(createEmbedMessage(undefined, verdad, attachment, undefined));
                 break;
 
-            // valvo que opinas de ?
+                // valvo que opinas de ?
             case 'que opinas de los carabineros?':
                 message.channel.send('A.C.A.B.');
                 break;
@@ -107,8 +120,7 @@ bot.on('message', (message) => {
                 message.channel.send('odio los botones');
                 break;
             case 'que opinas del estallido social?':
-                message.channel.s
-                message.channel.send('puta la verda es que está la cagá en todo el pais, piece of shiiiiiet faaaaacking biiiiitchh :notes: :notes:')
+                message.channel.send('puta la verda es que está la cagá en todo el pais, piece of shiiiiiet faaaaacking biiiiitchh :notes: :notes:');
                 break;
             case 'que opinas del valvo que no apaña?':
                 message.channel.send('uuuuh que laaaaaata ese tipo');
@@ -152,13 +164,13 @@ bot.on('message', (message) => {
                     .catch(console.error);
                 break;
             case 'forza?':
-                message.channel.send('perro nunca pensé escuchar eso, entrando')
+                message.channel.send('perro nunca pensé escuchar eso, entrando!');
                 bot.user.setActivity('Forza Horizon', { type: 'Playing' })
                     .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
                     .catch(console.error);
                 break;
             case 'apb?':
-                message.channel.send('uuuuuuhh igual, me vestiré de carabibueno para la ocasión')
+                message.channel.send('uuuuuuhh igual, me vestiré de carabibueno para la ocasión');
                 bot.user.setActivity('APB Reloaded', { type: 'Playing' })
                     .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
                     .catch(console.error);
