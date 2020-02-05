@@ -5,6 +5,7 @@ var bot = new Discord.Client();
 const attachment = new Discord.Attachment('./images/valvo-avatar.png', 'valvo-avatar.png');
 const valvoCeption = new Discord.Attachment('./images/spider-valvo.jpg');
 const gif1Dados = new Discord.Attachment('./images/gif/1dado.gif');
+const ytdl = require('ytdl-core-discord');
 
 
 bot.login(process.env.VALVO_TOKEN);
@@ -52,6 +53,32 @@ bot.on('message', (message) => {
         let args = message.content.substring(6);
         let descripcion = 'Tiro simple';
         let footer = 'uuuh sigue participando...';
+
+        //dame suerte
+
+        if (args.length >= 6 && message.content.substring(6, 17) == 'dame suerte') {
+
+            function play(connection) {
+                connection.play(ytdl('https://www.youtube.com/watch?v=qHTfVI-xN1Y', { type: 'opus' }));
+            }
+            const voiceChannel = message.member.voiceChannel;
+            if (!voiceChannel) return message.channel.send('pero peeeerro si quiere suerte tiene que entrar en un canal');
+            const permissions = voiceChannel.permissionsFor(message.client.user);
+            if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) {
+                return message.channel.send('uuuuh no tengo permisos para entrar');
+            }
+
+            try {
+                var connection = voiceChannel.join().then((res) => {
+                    //console.log(res);
+                    play(res);
+                });
+            } catch (err) {
+                console.log(err);
+                return message.channel.send(err);
+            }
+        }
+
 
         // valvo-dados
         if (args.length >= 6 && message.content.substring(6, 12) == '1 dado') {
