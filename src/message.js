@@ -1,84 +1,53 @@
-const { RichEmbed } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 
-exports.createEmbedMessage = (author = undefined, fields = undefined, thumbNail = undefined, image = undefined, footer = undefined, link = undefined) => {
-    let embed = new RichEmbed();
+const COLOR = 0x860202;
+const CELEBRATION_COLOR = 0xffd000;
 
-    if (undefined != author) {
-        embed.setAuthor(author);
-    }
+const TRUTH = 'la verdad es que soy un bot creado en el año 2020 para recordar los dias en los que valvo apañaba, la fuerte necesidad de esperar un yo te apaño de valvo le dio vida a este bot';
 
-    if (undefined != fields && fields.length > 0) {
-        for (const field of fields) {
-            embed.addField(field.name, " " + field.value);
-        }
-    }
+function truthEmbed() {
+  return new EmbedBuilder()
+    .setColor(COLOR)
+    .setThumbnail('attachment://valvo-avatar.png')
+    .addFields(
+      { name: 'La verdad', value: TRUTH },
+      { name: 'ayuda', value: '`/ayuda` `/apaña` `/frase` `/juguemos` `/dados`' },
+    );
+}
 
-    if (undefined != image) {
-        embed.setImage(image);
-    }
+function truthPayload(avatarPath) {
+  return {
+    embeds: [truthEmbed()],
+    files: [new AttachmentBuilder(avatarPath).setName('valvo-avatar.png')],
+  };
+}
 
-    if (undefined != thumbNail) {
-        embed.attachFile(thumbNail);
-        embed.setThumbnail('attachment://valvo-avatar.png');
-    }
+function commandsEmbed() {
+  return new EmbedBuilder()
+    .setColor(COLOR)
+    .setTitle('Valvo apaña (o no)')
+    .setDescription('El prefijo de antes era `valvo`. Ahora son comandos de barra, en el servidor.')
+    .addFields(
+      { name: '/apaña', value: 'Pídele que entre a un juego. Casi siempre tiene una excusa.' },
+      { name: '/historial', value: 'Cuántas veces se ha rajado, juego por juego.' },
+      { name: '/valheim', value: 'Un dato de Valheim, con fuente.' },
+      { name: '/milagro', value: 'Anota el día en que de verdad entró.' },
+      { name: '/juguemos', value: 'Las respuestas de siempre: fable, warframe, anthem, piratas…' },
+      { name: '/dados', value: 'Uno o dos daditos.' },
+      { name: '/frase', value: 'apañai, aburrido, botones, carabineros y el resto del repertorio.' },
+      { name: '/ayuda', value: 'Esta lista.' },
+      {
+        name: 'Por mensaje directo',
+        value: '`!comandos` y `!sugerencias` siguen vivos.',
+      },
+    );
+}
 
-    if (undefined != footer) {
-        embed.setFooter(footer.text, footer.icon);
-    }
-
-    if (undefined != link) {
-        embed.addField(link.name, link.value);
-    }
-    embed.setColor(0x860202);
-
-    return embed;
-};
-
-exports.sendMentionMessage = (text, message) => {
-    message.channel.send(`${message.author.toString()} ` + text);
-};
-
-exports.sendEmbedDado = (random, descripcion, avatar, author, footer) => {
-    let strCapitalize = descripcion.charAt(0).toUpperCase() + descripcion.slice(1);
-    let embed = new RichEmbed()
-        .setTitle('Valvo-Resultado')
-        .setDescription(strCapitalize)
-        .setThumbnail(avatar)
-        .addField('Jugador', `${author} sacó ` + random)
-        .attachFiles([`./images/1dado/${random}.png`])
-        .setImage(`attachment://${random}.png`)
-        .setFooter(footer);
-    return embed;
-};
-
-exports.sendEmbed2Dado = (dado1, dado2, descripcion, avatar, author, footer) => {
-    let strCapitalize = descripcion.charAt(0).toUpperCase() + descripcion.slice(1);
-    let totalDados = +dado1 + +dado2;
-    let embed = new RichEmbed()
-        .setTitle('Valvo-Resultado')
-        .setDescription(strCapitalize)
-        .setThumbnail(avatar)
-        .addField('Jugador', `${author} sacó ` + totalDados)
-        .setFooter(footer);
-    return embed;
-};
-
-exports.sendImgEmbed = (dado) => {
-    let embed = new RichEmbed()
-        .attachFiles([`./images/1dado/${dado}.png`])
-        .setImage(`attachment://${dado}.png`);
-    return embed;
-};
-
-exports.laVerdad = () => {
-    let verdad = [{
-            name: "La verdad",
-            value: "la verdad es que soy un bot creado en el año 2020 para recordar los dias en los que valvo apañaba, la fuerte necesidad de esperar un yo te apaño de valvo le dio vida a este bot"
-        },
-        {
-            name: "ayuda",
-            value: "`!comandos` `!sugerencias`"
-        }
-    ];
-    return verdad;
+module.exports = {
+  COLOR,
+  CELEBRATION_COLOR,
+  TRUTH,
+  truthEmbed,
+  truthPayload,
+  commandsEmbed,
 };

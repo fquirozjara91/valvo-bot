@@ -1,193 +1,98 @@
-var Discord = require('discord.js');
-const { createEmbedMessage, laVerdad, sendMentionMessage, sendEmbedDado, sendEmbed2Dado, sendImgEmbed } = require('./src/message');
+require('dotenv').config({ quiet: true });
 
-var bot = new Discord.Client();
-const attachment = new Discord.Attachment('./images/valvo-avatar.png', 'valvo-avatar.png');
-const valvoCeption = new Discord.Attachment('./images/spider-valvo.jpg');
-const gif1Dados = new Discord.Attachment('./images/gif/1dado.gif');
+const { Client, GatewayIntentBits, Events, MessageFlags } = require('discord.js');
+const { loadConfig, missingStartupConfig, printMissing } = require('./src/config');
+const { openStore } = require('./src/store');
+const { loadFacts } = require('./src/facts');
+const commands = require('./src/commands');
+const { startDetector } = require('./src/detector');
+const { handleMessage } = require('./src/legacy');
+const paths = require('./src/paths');
 
+function main() {
+  const config = loadConfig();
+  const missing = missingStartupConfig(config);
+  if (missing.length) {
+    printMissing('Falta configuración para arrancar:', missing);
+    process.exit(1);
+  }
 
-bot.login(process.env.VALVO_TOKEN);
+  let facts;
+  try {
+    facts = loadFacts(paths.facts);
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
 
-bot.on('ready', () => {
-    console.log(`${bot.user.tag} está ahora apañando!`);
-});
+  let store;
+  try {
+    store = openStore(paths.db);
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
 
-bot.on('message', (message) => {
+  const client = new Client({
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.MessageContent,
+      GatewayIntentBits.GuildPresences,
+      GatewayIntentBits.GuildMembers,
+    ],
+    allowedMentions: { parse: ['users'] },
+  });
 
-    // valvoception
-    if (message.author.tag == 'Valvoywea#6264' && message.content.startsWith('valvo')) {
-        message.channel.send("espera!... quien eres tu!?!?!?", { file: valvoCeption });
+  const byName = new Map(commands.map((command) => [command.data.name, command]));
+  const ctx = { store, facts, config, paths };
+  const detector = startDetector(client, ctx);
+
+  client.once(Events.ClientReady, async (readyClient) => {
+    console.log(`${readyClient.user.tag} está ahora apañando!`);
+    if (config.hypocriteMode) console.log('Modo hipócrita activo.');
+    else console.log('Sin VALVO_USER_ID: el modo hipócrita queda apagado. El resto funciona.');
+    if (!config.announceChannelId) {
+      console.log('Sin ANNOUNCE_CHANNEL_ID: el detector de juegos no va a publicar en ningún canal.');
     }
-
-    // mensajes privados
-    if (message.channel.type == 'dm' && message.author.tag != bot.user.tag) {
-        if (message.content.startsWith('!')) {
-            let args = message.content.substring(1);
-            switch (args) {
-                case 'comandos':
-                    let comandos = [{
-                            name: "prefijo",
-                            value: "valvo"
-                        },
-                        {
-                            name: "apañes",
-                            value: "`apañai?` `estoy aburrido` `eres un bot?`"
-                        },
-                        {
-                            name: "juguemos",
-                            value: "`fable` `warframe` `anthem` `piratas` `apb` `forza` `black desert`"
-                        }
-                    ];
-                    message.author.send(createEmbedMessage(undefined, comandos, attachment));
-                    break;
-                case 'sugerencias':
-                    message.author.send(createEmbedMessage(undefined, undefined, undefined, undefined, undefined, { name: 'Sugerencias', value: 'si quieres agregar nuevas funciones puedes dejar tu sugerencia en el siguiente link: [Click Aquí](https://github.com/fquirozjara91/valvo-bot/issues)' }));
-            }
-        }
+    try {
+      await detector.ready();
+    } catch (err) {
+      console.error('No pude revisar las presencias al partir:', err.message);
     }
+  });
 
-
-    if (message.content.startsWith('valvo') && message.channel.type != 'dm') {
-        let args = message.content.substring(6);
-        let descripcion = 'Tiro simple';
-        let footer = 'uuuh sigue participando...';
-
-        // valvo-dados
-        if (args.length >= 6 && message.content.substring(6, 12) == '1 dado') {
-            if (message.content.substring(17).length > 0) {
-                descripcion = message.content.substring(18);
-            }
-
-            message.channel.send("***1 daditooo!***", { file: gif1Dados }).then((msg) => {
-                msg.delete(4000).then(() => {
-                    let dado = (Math.round(Math.random() * (6 - 1) + 1)).toString();
-                    if (dado < 4) {
-                        footer = 'JAJAJAJA fucking looooser!';
-                    } else if (dado == 6) {
-                        footer = 'un madaaafaking SIIIIIIIX!!';
-                    }
-                    message.channel.send(sendEmbedDado(dado, descripcion, message.author.avatarURL, message.author.toString(), footer));
-                });
-            });
-        }
-        if (args.length >= 6 && message.content.substring(6, 13) == '2 dados') {
-            if (message.content.substring(18).length > 0) {
-                descripcion = message.content.substring(18);
-            }
-            message.channel.send("***2 daditooos!***", { file: gif1Dados }).then((msg) => {
-                msg.delete(4000).then(() => {
-                    let dado1 = (Math.round(Math.random() * (6 - 1) + 1)).toString();
-                    let dado2 = (Math.round(Math.random() * (6 - 1) + 1)).toString();
-                    if (+dado1 + +dado2 < 5) {
-                        footer = 'JAJAJAJA fucking looooser!';
-                    } else if (+dado1 + +dado2 == 12) {
-                        footer = 'Un gran poder con lleva una gran responsabilidad, Tachuela Chico';
-                    }
-                    message.channel.send(sendImgEmbed(dado1));
-                    message.channel.send(sendImgEmbed(dado2));
-                    message.channel.send(sendEmbed2Dado(dado1, dado2, descripcion, message.author.avatarURL, message.author.toString(), footer));
-                });
-            });
-        }
-
-        // frases de apañe
-        switch (args) {
-            case 'apañai?':
-                message.channel.send('demás po perro!');
-                break;
-            case 'estoy aburrido':
-                message.channel.send('que quiere jugar? yo apaño a lo que sea');
-                break;
-            case 'ayuda':
-                message.author.send(`uuuh que pasa ${message.author.username}? a que quiere que le apañe?`);
-                break;
-            case 'deja de apañar':
-                message.channel.send('lo siento, tenía muchas ganas de apañar');
-                bot.user.setActivity(null);
-                break;
-            case 'eres un bot?':
-                let verdad = laVerdad();
-                sendMentionMessage(':incoming_envelope: acompañame, te contaré una triste historia', message);
-                message.author.send(createEmbedMessage(undefined, verdad, attachment, undefined));
-                break;
-
-                // valvo que opinas de ?
-            case 'que opinas de los carabineros?':
-                message.channel.send('A.C.A.B.');
-                break;
-            case 'que opinas de los botones?':
-                message.channel.send('odio los botones');
-                break;
-            case 'que opinas del estallido social?':
-                message.channel.send('puta la verda es que está la cagá en todo el pais, piece of shiiiiiet faaaaacking biiiiitchh :notes: :notes:');
-                break;
-            case 'que opinas del valvo que no apaña?':
-                message.channel.send('uuuuh que laaaaaata ese tipo');
-                break;
-        }
+  client.on(Events.InteractionCreate, async (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+    const command = byName.get(interaction.commandName);
+    if (!command) return;
+    try {
+      await command.execute(interaction, ctx);
+    } catch (err) {
+      console.error(`Falló /${interaction.commandName}:`, err);
+      const payload = {
+        content: 'uuuuh, se me cayó el apañe. Intenta de nuevo.',
+        flags: MessageFlags.Ephemeral,
+      };
+      const pending = interaction.replied || interaction.deferred
+        ? interaction.followUp(payload)
+        : interaction.reply(payload);
+      await pending.catch(() => {});
     }
+  });
 
-    // frases jugemos
-    if (message.content.startsWith('valvo juguemos') && message.channel.type != 'dm') {
-        let juguemos = message.content.substring(15);
-        console.log(juguemos);
-        switch (juguemos) {
-            case 'fable?':
-                message.channel.send('ya po! abriendo su fable');
-                bot.user.setActivity('Fable', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            case 'warframe?':
-                message.channel.send('uuuuuhh su framio, YPAPUY IY UTYKATJEP');
-                bot.user.setActivity('Warframe', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            case 'anthem?':
-                message.channel.send('no hay otra wea? little biiiiitch, ya igual si');
-                bot.user.setActivity('Anthem', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            case 'black desert?':
-                message.channel.send('perro aunque nunca me carrió, ahora es el momento para que lo haga');
-                bot.user.setActivity('Black Desert Online', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            case 'piratas?':
-                message.channel.send('siempre y cuando me den cofres');
-                bot.user.setActivity('Sea of Thieves', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            case 'forza?':
-                message.channel.send('perro nunca pensé escuchar eso, entrando!');
-                bot.user.setActivity('Forza Horizon', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            case 'apb?':
-                message.channel.send('uuuuuuhh igual, me vestiré de carabibueno para la ocasión');
-                bot.user.setActivity('APB Reloaded', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
+  client.on(Events.MessageCreate, (message) => {
+    handleMessage(message, ctx).catch((err) => console.error('Mensaje:', err.message));
+  });
 
-            case 'temtem?':
-                message.channel.send('uuuuuuhh hay que atraparlos a todos!');
-                bot.user.setActivity('Temtem', { type: 'Playing' })
-                    .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-                    .catch(console.error);
-                break;
-            default:
-                message.channel.send('uuuuuuh pero peeeerro no tengo ese gamesio, lo bajo al toque, pa puro apañar');
-                bot.user.setActivity(null);
-                break;
-        }
+  client.on(Events.Error, (err) => {
+    console.error('Error del cliente:', err.message);
+  });
 
-    }
+  client.login(config.token).catch((err) => {
+    console.error('No pude conectar con Discord:', err.message || err);
+    process.exit(1);
+  });
+}
 
-});
+main();
