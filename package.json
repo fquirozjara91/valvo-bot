@@ -1,13 +1,26 @@
 {
-    "name": "valvo-si",
-    "version": "1.0.0",
-    "description": "Este bot te puede acompañar cuando valvo no",
-    "main": "bot.js",
-    "author": "Wigan",
-    "scripts": {
-        "start": "node bot.js"
-    },
-    "dependencies": {
-        "discord.js": "^11.5.1"
-    }
+  "name": "valvo-si",
+  "version": "2.0.0",
+  "description": "Este bot te puede acompañar cuando Valvo no",
+  "main": "bot.js",
+  "author": "Wigan",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node bot.js",
+    "register": "node scripts/register-commands.js",
+    "lint": "eslint .",
+    "test": "node --test",
+    "check": "npm run lint && npm test && npm audit"
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^18.0.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0"
+  }
 }
